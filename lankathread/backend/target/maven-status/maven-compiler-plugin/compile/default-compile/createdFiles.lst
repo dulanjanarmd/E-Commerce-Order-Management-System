@@ -18,12 +18,14 @@ com\lankathread\service\WishlistService.class
 com\lankathread\controller\AuthController.class
 com\lankathread\dto\CartRequest.class
 com\lankathread\repository\CategoryRepository.class
+com\lankathread\config\WebMvcConfig.class
 com\lankathread\model\Order$PaymentMethod.class
 com\lankathread\service\OrderService.class
 com\lankathread\service\ProductService.class
 com\lankathread\model\Category.class
 com\lankathread\security\UserDetailsServiceImpl.class
 com\lankathread\service\CategoryService.class
+com\lankathread\controller\UploadController$1.class
 com\lankathread\dto\ApiResponse.class
 com\lankathread\model\Product$Gender.class
 com\lankathread\model\CartItem.class
@@ -40,6 +42,7 @@ com\lankathread\controller\CategoryController.class
 com\lankathread\repository\ProductRepository.class
 com\lankathread\controller\CartController.class
 com\lankathread\controller\AuthController$GoogleLoginRequest.class
+com\lankathread\controller\UploadController.class
 com\lankathread\model\Product$SizeStock.class
 com\lankathread\model\OrderItem.class
 com\lankathread\service\CartService.class
