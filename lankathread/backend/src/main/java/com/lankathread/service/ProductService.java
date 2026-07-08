@@ -125,6 +125,9 @@ public class ProductService {
         existing.setIsNewArrival(product.getIsNewArrival());
         existing.setIsFeatured(product.getIsFeatured());
         existing.setIsActive(product.getIsActive());
+        existing.setBarcode(product.getBarcode());
+        existing.setStoreLocation(product.getStoreLocation());
+        existing.setIsArchived(product.getIsArchived());
         Product updated = productRepository.save(existing);
         return ApiResponse.success("Product updated", updated);
     }
@@ -135,5 +138,23 @@ public class ProductService {
         product.setIsActive(false);
         productRepository.save(product);
         return ApiResponse.success("Product deactivated");
+    }
+
+    public ApiResponse archiveProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setIsArchived(true);
+        product.setIsActive(false);
+        productRepository.save(product);
+        return ApiResponse.success("Product archived");
+    }
+
+    public ApiResponse unarchiveProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setIsArchived(false);
+        product.setIsActive(true);
+        productRepository.save(product);
+        return ApiResponse.success("Product unarchived and activated");
     }
 }

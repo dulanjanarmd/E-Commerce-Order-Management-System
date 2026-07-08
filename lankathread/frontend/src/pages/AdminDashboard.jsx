@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, Form, Modal, Tab, Tabs } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiShoppingBag, FiUsers, FiDollarSign, FiPackage, FiTrendingUp, FiEdit2, FiTrash2, FiPlus, FiEye, FiFilter, FiCheck } from 'react-icons/fi';
+import { FiShoppingBag, FiUsers, FiDollarSign, FiPackage, FiTrendingUp, FiEdit2, FiTrash2, FiPlus, FiEye, FiFilter, FiCheck, FiArchive, FiFolder, FiTag } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import api, { orderAPI, productAPI, categoryAPI } from '../services/api';
+import api, { orderAPI, productAPI, categoryAPI, promotionAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
-    totalOrders: 156,
-    pendingOrders: 12,
-    confirmedOrders: 8,
-    shippedOrders: 23,
-    deliveredOrders: 108,
-    cancelledOrders: 5,
-    totalRevenue: 2850000,
-    totalProducts: 342,
-    totalCustomers: 528
+    totalOrders: 0,
+    pendingOrders: 0,
+    confirmedOrders: 0,
+    shippedOrders: 0,
+    deliveredOrders: 0,
+    cancelledOrders: 0,
+    totalRevenue: 0,
+    totalProducts: 0,
+    totalCustomers: 0
   });
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -32,10 +32,25 @@ const AdminDashboard = () => {
     mainImage: '',
     category: null,
     isActive: true,
-    description: ''
+    description: '',
+    barcode: '',
+    storeLocation: ''
   });
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showPromotionModal, setShowPromotionModal] = useState(false);
+  const [editingPromotion, setEditingPromotion] = useState(null);
+  const [promotionForm, setPromotionForm] = useState({
+    productId: null,
+    discountPercentage: null,
+    discountAmount: null,
+    salePrice: null,
+    startDate: '',
+    endDate: '',
+    description: '',
+    isActive: true
+  });
+  const [promotions, setPromotions] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -51,14 +66,16 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [statsRes, ordersRes, productsRes] = await Promise.all([
+      const [statsRes, ordersRes, productsRes, promotionsRes] = await Promise.all([
         orderAPI.getStats(),
         orderAPI.getAll(),
-        productAPI.getAll()
+        productAPI.getAll(),
+        promotionAPI.getAll()
       ]);
       if (statsRes.data.success) setStats(statsRes.data.data);
       if (ordersRes.data.success) setOrders(ordersRes.data.data);
       if (productsRes.data.success) setProducts(productsRes.data.data);
+      if (promotionsRes.data) setPromotions(promotionsRes.data);
       // fetch categories
       try {
         const catRes = await categoryAPI.getAll();
@@ -92,7 +109,9 @@ const AdminDashboard = () => {
         mainImage: product.mainImage || '',
         category: product.category?.id || null,
         isActive: product.isActive ?? true,
-        description: product.description || ''
+        description: product.description || '',
+        barcode: product.barcode || '',
+        storeLocation: product.storeLocation || ''
       });
     } else {
       setEditingProduct(null);
@@ -104,7 +123,9 @@ const AdminDashboard = () => {
         mainImage: '',
         category: null,
         isActive: true,
-        description: ''
+        description: '',
+        barcode: '',
+        storeLocation: ''
       });
     }
     setShowProductModal(true);
@@ -188,7 +209,9 @@ const AdminDashboard = () => {
         mainImage: productForm.mainImage,
         description: productForm.description,
         isActive: productForm.isActive,
-        category: productForm.category ? { id: Number(productForm.category) } : null
+        category: productForm.category ? { id: Number(productForm.category) } : null,
+        barcode: productForm.barcode,
+        storeLocation: productForm.storeLocation
       };
 
       if (editingProduct && editingProduct.id) {
@@ -217,6 +240,103 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleArchiveProduct = async (productId) => {
+    if (!window.confirm('Archive this product? It will be hidden from the store.')) return;
+    try {
+      await api.put(`/products/${productId}/archive`);
+      toast.success('Product archived');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to archive product');
+    }
+  };
+
+  const handleUnarchiveProduct = async (productId) => {
+    try {
+      await api.put(`/products/${productId}/unarchive`);
+      toast.success('Product unarchived');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to unarchive product');
+    }
+  };
+
+  const openPromotionModal = (product = null) => {
+    if (product) {
+      setEditingPromotion(null);
+      setPromotionForm({
+        productId: product.id,
+        discountPercentage: null,
+        discountAmount: null,
+        salePrice: null,
+        startDate: '',
+        endDate: '',
+        description: '',
+        isActive: true
+      });
+    } else if (editingPromotion) {
+      setPromotionForm({
+        productId: editingPromotion.product?.id,
+        discountPercentage: editingPromotion.discountPercentage,
+        discountAmount: editingPromotion.discountAmount,
+        salePrice: editingPromotion.salePrice,
+        startDate: editingPromotion.startDate ? editingPromotion.startDate.split('T')[0] : '',
+        endDate: editingPromotion.endDate ? editingPromotion.endDate.split('T')[0] : '',
+        description: editingPromotion.description || '',
+        isActive: editingPromotion.isActive ?? true
+      });
+    }
+    setShowPromotionModal(true);
+  };
+
+  const closePromotionModal = () => {
+    setShowPromotionModal(false);
+    setEditingPromotion(null);
+  };
+
+  const handlePromotionFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setPromotionForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSavePromotion = async () => {
+    try {
+      const payload = {
+        ...promotionForm,
+        product: promotionForm.productId ? { id: Number(promotionForm.productId) } : null,
+        discountPercentage: promotionForm.discountPercentage ? Number(promotionForm.discountPercentage) : null,
+        discountAmount: promotionForm.discountAmount ? Number(promotionForm.discountAmount) : null,
+        salePrice: promotionForm.salePrice ? Number(promotionForm.salePrice) : null,
+        startDate: promotionForm.startDate ? promotionForm.startDate + 'T00:00:00' : null,
+        endDate: promotionForm.endDate ? promotionForm.endDate + 'T23:59:59' : null
+      };
+
+      if (editingPromotion && editingPromotion.id) {
+        await promotionAPI.update(editingPromotion.id, payload);
+        toast.success('Promotion updated');
+      } else {
+        await promotionAPI.create(payload);
+        toast.success('Promotion created');
+      }
+      closePromotionModal();
+      fetchData();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to save promotion');
+    }
+  };
+
+  const handleDeletePromotion = async (promotionId) => {
+    if (!window.confirm('Delete this promotion?')) return;
+    try {
+      await promotionAPI.delete(promotionId);
+      toast.success('Promotion deleted');
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to delete promotion');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const colors = {
       'PENDING': 'warning',
@@ -228,26 +348,8 @@ const AdminDashboard = () => {
     return <Badge bg={colors[status] || 'secondary'}>{status}</Badge>;
   };
 
-  const mockOrders = [
-    { id: 1, orderNumber: 'LT1704067200000', user: { fullName: 'Saman Perera' }, status: 'DELIVERED', paymentMethod: 'CASH_ON_DELIVERY', finalAmount: 8230, createdAt: '2024-12-28T10:00:00', shippingCity: 'Colombo' },
-    { id: 2, orderNumber: 'LT1704153600000', user: { fullName: 'Nisha Fernando' }, status: 'SHIPPED', paymentMethod: 'CASH_ON_DELIVERY', finalAmount: 5990, createdAt: '2024-12-30T14:30:00', shippingCity: 'Kandy' },
-    { id: 3, orderNumber: 'LT1704240000000', user: { fullName: 'Kamal Silva' }, status: 'PENDING', paymentMethod: 'CASH_ON_DELIVERY', finalAmount: 12500, createdAt: '2025-01-02T09:15:00', shippingCity: 'Galle' },
-    { id: 4, orderNumber: 'LT1704326400000', user: { fullName: 'Priya Rajapakse' }, status: 'CONFIRMED', paymentMethod: 'CREDIT_CARD', finalAmount: 4590, createdAt: '2025-01-03T16:45:00', shippingCity: 'Negombo' },
-    { id: 5, orderNumber: 'LT1704412800000', user: { fullName: 'Dinesh Kumara' }, status: 'PENDING', paymentMethod: 'CASH_ON_DELIVERY', finalAmount: 7880, createdAt: '2025-01-04T11:20:00', shippingCity: 'Jaffna' },
-    { id: 6, orderNumber: 'LT1704499200000', user: { fullName: 'Amara Jayasinghe' }, status: 'SHIPPED', paymentMethod: 'CASH_ON_DELIVERY', finalAmount: 12500, createdAt: '2025-01-05T08:00:00', shippingCity: 'Colombo' },
-  ];
-
-  const mockProducts = [
-    { id: 1, name: 'Floral Summer Dress', price: 4590, salePrice: 3290, stockQuantity: 15, brand: 'LankaThread', category: { name: 'Dresses' }, isActive: true },
-    { id: 2, name: 'Classic Linen Shirt', price: 3890, stockQuantity: 20, brand: 'LankaThread', category: { name: 'Shirts' }, isActive: true },
-    { id: 3, name: 'Kids Cotton T-Shirt', price: 1890, stockQuantity: 30, brand: 'LankaThread', category: { name: 'T-Shirts' }, isActive: true },
-    { id: 4, name: 'Teen Denim Jacket', price: 5990, salePrice: 4590, stockQuantity: 8, brand: 'LankaThread', category: { name: 'Jackets' }, isActive: true },
-    { id: 5, name: 'Traditional Saree', price: 12500, stockQuantity: 5, brand: 'Heritage', category: { name: 'Sarees' }, isActive: true },
-    { id: 6, name: 'Casual Polo Shirt', price: 2890, stockQuantity: 25, brand: 'LankaThread', category: { name: 'Polo Shirts' }, isActive: true },
-  ];
-
-  const displayOrders = orders.length > 0 ? orders : mockOrders;
-  const displayProducts = products.length > 0 ? products : mockProducts;
+  const displayOrders = orders;
+  const displayProducts = products;
 
   if (!user) {
     return (
@@ -281,6 +383,12 @@ const AdminDashboard = () => {
               <button className={`nav-link ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
                 <FiShoppingBag className="me-2" /> Products
               </button>
+              <button className={`nav-link ${activeTab === 'categories' ? 'active' : ''}`} onClick={() => window.location.href = '/admin/categories'}>
+                <FiFolder className="me-2" /> Categories
+              </button>
+              <button className={`nav-link ${activeTab === 'promotions' ? 'active' : ''}`} onClick={() => setActiveTab('promotions')}>
+                <FiTag className="me-2" /> Promotions
+              </button>
               <button className={`nav-link ${activeTab === 'customers' ? 'active' : ''}`} onClick={() => setActiveTab('customers')}>
                 <FiUsers className="me-2" /> Customers
               </button>
@@ -296,6 +404,7 @@ const AdminDashboard = () => {
               <Tab eventKey="dashboard" title="Dashboard" />
               <Tab eventKey="orders" title="Orders" />
               <Tab eventKey="products" title="Products" />
+              <Tab eventKey="promotions" title="Promotions" />
             </Tabs>
           </div>
 
@@ -491,8 +600,10 @@ const AdminDashboard = () => {
                         <tr>
                           <th>Product</th>
                           <th>Category</th>
-                          <th>Price</th>
+                          <th>Price (LKR)</th>
                           <th>Stock</th>
+                          <th>Barcode</th>
+                          <th>Store Location</th>
                           <th>Status</th>
                           <th>Actions</th>
                         </tr>
@@ -523,20 +634,111 @@ const AdminDashboard = () => {
                               </span>
                             </td>
                             <td>
-                              <Badge bg={product.isActive ? 'success' : 'secondary'}>
-                                {product.isActive ? 'Active' : 'Inactive'}
-                              </Badge>
+                              <small className="text-muted">{product.barcode || '-'}</small>
                             </td>
                             <td>
-                              <Button variant="link" className="p-0 me-2" onClick={() => openProductModal(product)}>
+                              <small className="text-muted">{product.storeLocation || '-'}</small>
+                            </td>
+                            <td>
+                              {product.isArchived ? (
+                                <Badge bg="warning"><FiArchive className="me-1" />Archived</Badge>
+                              ) : (
+                                <Badge bg={product.isActive ? 'success' : 'secondary'}>
+                                  {product.isActive ? 'Active' : 'Inactive'}
+                                </Badge>
+                              )}
+                            </td>
+                            <td>
+                              <Button variant="link" className="p-0 me-1" onClick={() => openProductModal(product)} title="Edit">
                                 <FiEdit2 size={16} />
                               </Button>
-                              <Button variant="link" className="p-0 text-danger" onClick={() => handleDeleteProduct(product.id)}>
+                              <Button variant="link" className="p-0 me-1" onClick={() => navigate(`/products/${product.slug}`)} title="View">
+                                <FiEye size={16} />
+                              </Button>
+                              {product.isArchived ? (
+                                <Button variant="link" className="p-0 me-1 text-success" onClick={() => handleUnarchiveProduct(product.id)} title="Unarchive">
+                                  <FiArchive size={16} />
+                                </Button>
+                              ) : (
+                                <Button variant="link" className="p-0 me-1 text-warning" onClick={() => handleArchiveProduct(product.id)} title="Archive">
+                                  <FiArchive size={16} />
+                                </Button>
+                              )}
+                              <Button variant="link" className="p-0 text-danger" onClick={() => handleDeleteProduct(product.id)} title="Delete">
                                 <FiTrash2 size={16} />
                               </Button>
                             </td>
                           </tr>
                         ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                </Card.Body>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'promotions' && (
+            <div>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="mb-0">Promotion Management</h4>
+                <Button className="btn-primary-custom" onClick={() => openPromotionModal(null)}>
+                  <FiPlus className="me-2" /> Add Promotion
+                </Button>
+              </div>
+              <Card>
+                <Card.Body className="p-0">
+                  <div className="table-responsive">
+                    <Table className="admin-table mb-0">
+                      <thead>
+                        <tr>
+                          <th>Product</th>
+                          <th>Discount Type</th>
+                          <th>Discount Value</th>
+                          <th>Sale Price</th>
+                          <th>Start Date</th>
+                          <th>End Date</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {promotions.map(promotion => (
+                          <tr key={promotion.id}>
+                            <td>{promotion.product?.name || 'N/A'}</td>
+                            <td>
+                              {promotion.discountPercentage ? 'Percentage' : promotion.discountAmount ? 'Fixed Amount' : promotion.salePrice ? 'Sale Price' : '-'}
+                            </td>
+                            <td>
+                              {promotion.discountPercentage && `${promotion.discountPercentage}%`}
+                              {promotion.discountAmount && `LKR ${promotion.discountAmount}`}
+                              {!promotion.discountPercentage && !promotion.discountAmount && '-'}
+                            </td>
+                            <td>
+                              {promotion.salePrice ? `LKR ${promotion.salePrice.toLocaleString()}` : '-'}
+                            </td>
+                            <td>{promotion.startDate ? new Date(promotion.startDate).toLocaleDateString() : '-'}</td>
+                            <td>{promotion.endDate ? new Date(promotion.endDate).toLocaleDateString() : '-'}</td>
+                            <td>
+                              <Badge bg={promotion.isActive ? 'success' : 'secondary'}>
+                                {promotion.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
+                            </td>
+                            <td>
+                              <Button variant="link" className="p-0 me-2" onClick={() => { setEditingPromotion(promotion); openPromotionModal(); }}>
+                                <FiEdit2 size={16} />
+                              </Button>
+                              <Button variant="link" className="p-0 text-danger" onClick={() => handleDeletePromotion(promotion.id)}>
+                                <FiTrash2 size={16} />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                        {promotions.length === 0 && (
+                          <tr>
+                            <td colSpan="8" className="text-center py-4">No promotions found</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </div>
@@ -580,8 +782,13 @@ const AdminDashboard = () => {
                   <Form.Label>Category</Form.Label>
                   <Form.Select name="category" value={productForm.category || ''} onChange={handleProductFormChange}>
                     <option value="">Select category</option>
-                    {categories.map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    {categories.filter(cat => !cat.parentId).map(parent => (
+                      <optgroup key={parent.id} label={parent.name}>
+                        <option value={parent.id}>{parent.name} (Main)</option>
+                        {categories.filter(cat => cat.parentId === parent.id).map(sub => (
+                          <option key={sub.id} value={sub.id}>↳ {sub.name}</option>
+                        ))}
+                      </optgroup>
                     ))}
                   </Form.Select>
                 </Form.Group>
@@ -598,6 +805,14 @@ const AdminDashboard = () => {
                 <Form.Group className="mb-3">
                   <Form.Label>Stock Quantity</Form.Label>
                   <Form.Control type="number" name="stockQuantity" value={productForm.stockQuantity} onChange={handleProductFormChange} />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Barcode</Form.Label>
+                  <Form.Control name="barcode" value={productForm.barcode} onChange={handleProductFormChange} placeholder="e.g., LT001001" />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Store Location</Form.Label>
+                  <Form.Control name="storeLocation" value={productForm.storeLocation} onChange={handleProductFormChange} placeholder="e.g., Aisle-1-Shelf-A" />
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Image URL or Upload</Form.Label>
@@ -617,6 +832,75 @@ const AdminDashboard = () => {
         <Modal.Footer>
           <Button variant="secondary" onClick={closeProductModal}>Cancel</Button>
           <Button variant="primary" onClick={handleSaveProduct}>{editingProduct ? 'Save Changes' : 'Create Product'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Promotion Modal */}
+      <Modal show={showPromotionModal} onHide={closePromotionModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>{editingPromotion ? 'Edit Promotion' : 'Add Promotion'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Row className="g-3">
+              <Col md={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Product</Form.Label>
+                  <Form.Select name="productId" value={promotionForm.productId || ''} onChange={handlePromotionFormChange} disabled={!!editingPromotion}>
+                    <option value="">Select product</option>
+                    {products.map(product => (
+                      <option key={product.id} value={product.id}>{product.name}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Discount Percentage (%)</Form.Label>
+                  <Form.Control type="number" name="discountPercentage" value={promotionForm.discountPercentage || ''} onChange={handlePromotionFormChange} placeholder="e.g., 20" />
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Discount Amount (LKR)</Form.Label>
+                  <Form.Control type="number" name="discountAmount" value={promotionForm.discountAmount || ''} onChange={handlePromotionFormChange} placeholder="e.g., 500" />
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Sale Price (LKR)</Form.Label>
+                  <Form.Control type="number" name="salePrice" value={promotionForm.salePrice || ''} onChange={handlePromotionFormChange} placeholder="e.g., 2990" />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Start Date</Form.Label>
+                  <Form.Control type="date" name="startDate" value={promotionForm.startDate} onChange={handlePromotionFormChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>End Date</Form.Label>
+                  <Form.Control type="date" name="endDate" value={promotionForm.endDate} onChange={handlePromotionFormChange} />
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control as="textarea" rows={3} name="description" value={promotionForm.description} onChange={handlePromotionFormChange} placeholder="Promotion description..." />
+                </Form.Group>
+              </Col>
+              <Col md={12}>
+                <Form.Group className="mb-3 form-check">
+                  <Form.Check type="checkbox" label="Active" name="isActive" checked={promotionForm.isActive} onChange={handlePromotionFormChange} />
+                </Form.Group>
+              </Col>
+            </Row>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closePromotionModal}>Cancel</Button>
+          <Button variant="primary" onClick={handleSavePromotion}>{editingPromotion ? 'Save Changes' : 'Create Promotion'}</Button>
         </Modal.Footer>
       </Modal>
     </Container>

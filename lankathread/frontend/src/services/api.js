@@ -60,7 +60,10 @@ export const productAPI = {
 export const categoryAPI = {
   getAll: () => api.get('/categories'),
   getParentCategories: () => api.get('/categories/parent'),
-  getSubcategories: (parentId) => api.get(`/categories/${parentId}/subcategories`)
+  getSubcategories: (parentId) => api.get(`/categories/${parentId}/subcategories`),
+  create: (data) => api.post('/categories', data),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`)
 };
 
 // Cart APIs
@@ -89,4 +92,15 @@ export const orderAPI = {
   getAll: () => api.get('/orders/admin/all'),
   updateStatus: (orderId, status) => api.put(`/orders/admin/${orderId}/status?status=${status}`),
   getStats: () => api.get('/orders/admin/stats')
+};
+
+// Promotion APIs
+export const promotionAPI = {
+  getAll: () => api.get('/promotions'),
+  getActive: () => api.get('/promotions/active'),
+  getByProduct: (productId) => api.get(`/promotions/product/${productId}`),
+  getById: (id) => api.get(`/promotions/${id}`),
+  create: (data) => api.post('/promotions', data),
+  update: (id, data) => api.put(`/promotions/${id}`, data),
+  delete: (id) => api.delete(`/promotions/${id}`)
 };

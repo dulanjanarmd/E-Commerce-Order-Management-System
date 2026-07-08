@@ -18,6 +18,7 @@ import Profile from './pages/Profile'
 import Orders from './pages/Orders'
 import Wishlist from './pages/Wishlist'
 import AdminDashboard from './pages/AdminDashboard'
+import CategoryManagement from './pages/CategoryManagement'
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/orders" element={<Orders />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/categories" element={<CategoryManagement />} />
             </Routes>
           </main>
           <Footer />

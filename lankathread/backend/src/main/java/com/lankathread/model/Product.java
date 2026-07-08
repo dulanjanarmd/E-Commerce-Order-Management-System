@@ -83,7 +83,16 @@ public class Product {
     
     @Column(name = "is_active")
     private Boolean isActive = true;
-    
+
+    @Column(name = "is_archived")
+    private Boolean isArchived = false;
+
+    @Column(name = "barcode")
+    private String barcode;
+
+    @Column(name = "store_location")
+    private String storeLocation;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     

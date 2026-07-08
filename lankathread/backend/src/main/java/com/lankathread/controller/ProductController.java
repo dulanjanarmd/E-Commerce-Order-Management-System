@@ -78,4 +78,14 @@ public class ProductController {
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
         return ResponseEntity.ok(productService.deleteProduct(id));
     }
+
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<ApiResponse> archiveProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.archiveProduct(id));
+    }
+
+    @PutMapping("/{id}/unarchive")
+    public ResponseEntity<ApiResponse> unarchiveProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.unarchiveProduct(id));
+    }
 }
