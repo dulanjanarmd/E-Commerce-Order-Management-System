@@ -12,8 +12,12 @@ com\lankathread\config\DataInitializer.class
 com\lankathread\model\Product.class
 com\lankathread\controller\AdminController.class
 com\lankathread\model\Order.class
+com\lankathread\model\Promotion.class
 com\lankathread\security\JwtTokenProvider.class
+com\lankathread\service\PromotionService.class
 com\lankathread\controller\WishlistController.class
+com\lankathread\service\EmailService.class
+com\lankathread\controller\PromotionController.class
 com\lankathread\service\WishlistService.class
 com\lankathread\controller\AuthController.class
 com\lankathread\dto\CartRequest.class
@@ -34,6 +38,8 @@ com\lankathread\dto\ProductFilterRequest.class
 com\lankathread\service\UserService.class
 com\lankathread\repository\OrderRepository.class
 com\lankathread\dto\LoginRequest.class
+com\lankathread\dto\ForgotPasswordRequest.class
+com\lankathread\dto\ResetPasswordRequest.class
 com\lankathread\dto\RegisterRequest.class
 com\lankathread\model\User.class
 com\lankathread\dto\UserProfileResponse.class
@@ -49,3 +55,4 @@ com\lankathread\service\CartService.class
 com\lankathread\model\User$Role.class
 com\lankathread\controller\ProductController.class
 com\lankathread\dto\JwtResponse.class
+com\lankathread\repository\PromotionRepository.class
