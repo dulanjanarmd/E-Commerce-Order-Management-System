@@ -176,12 +176,6 @@ const AdminDashboard = () => {
             });
         }
       });
-        })
-        .catch(err => {
-          console.error(err);
-          toast.error('Upload failed');
-        });
-    }
   };
 
   const handleSaveProduct = async () => {
@@ -308,7 +302,7 @@ const AdminDashboard = () => {
           {activeTab === 'dashboard' && (
             <div>
               <h4 className="mb-4">Dashboard Overview</h4>
-              
+
               {/* Stats Cards */}
               <Row className="g-4 mb-4">
                 <Col sm={6} xl={3}>
@@ -458,8 +452,8 @@ const AdminDashboard = () => {
                             <td>{order.paymentMethod === 'CASH_ON_DELIVERY' ? 'COD' : 'Card'}</td>
                             <td>{getStatusBadge(order.status)}</td>
                             <td>
-                              <Form.Select 
-                                size="sm" 
+                              <Form.Select
+                                size="sm"
                                 className="status-select"
                                 value={order.status}
                                 onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
