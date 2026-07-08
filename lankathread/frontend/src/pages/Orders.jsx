@@ -48,54 +48,7 @@ const Orders = () => {
     );
   };
 
-  const mockOrders = [
-    {
-      id: 1,
-      orderNumber: 'LT1704067200000',
-      status: 'DELIVERED',
-      paymentMethod: 'CASH_ON_DELIVERY',
-      paymentStatus: 'PAID',
-      totalAmount: 7880,
-      shippingCost: 350,
-      finalAmount: 8230,
-      createdAt: '2024-12-28T10:00:00',
-      orderItems: [
-        { product: { name: 'Floral Summer Dress', mainImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=100' }, quantity: 1, size: 'M', unitPrice: 3290, totalPrice: 3290 },
-        { product: { name: 'Classic Linen Shirt', mainImage: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=100' }, quantity: 1, size: 'L', unitPrice: 3890, totalPrice: 3890 }
-      ]
-    },
-    {
-      id: 2,
-      orderNumber: 'LT1704153600000',
-      status: 'SHIPPED',
-      paymentMethod: 'CASH_ON_DELIVERY',
-      paymentStatus: 'PENDING',
-      totalAmount: 5990,
-      shippingCost: 0,
-      finalAmount: 5990,
-      createdAt: '2024-12-30T14:30:00',
-      orderItems: [
-        { product: { name: 'Teen Denim Jacket', mainImage: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=100' }, quantity: 1, size: 'M', unitPrice: 4590, totalPrice: 4590 },
-        { product: { name: 'Kids Cotton T-Shirt', mainImage: 'https://images.unsplash.com/photo-1519278407-7e5f4b54cc6a?w=100' }, quantity: 2, size: 'S', unitPrice: 1890, totalPrice: 3780 }
-      ]
-    },
-    {
-      id: 3,
-      orderNumber: 'LT1704240000000',
-      status: 'PENDING',
-      paymentMethod: 'CASH_ON_DELIVERY',
-      paymentStatus: 'PENDING',
-      totalAmount: 12500,
-      shippingCost: 0,
-      finalAmount: 12500,
-      createdAt: '2025-01-02T09:15:00',
-      orderItems: [
-        { product: { name: 'Traditional Saree', mainImage: 'https://images.unsplash.com/photo-1583391733951-8f1cb5da7574?w=100' }, quantity: 1, size: 'Free Size', unitPrice: 12500, totalPrice: 12500 }
-      ]
-    }
-  ];
-
-  const displayOrders = orders.length > 0 ? orders : mockOrders;
+  const displayOrders = orders;
 
   if (!user) {
     return (

@@ -41,6 +41,24 @@ const Products = () => {
     fetchProducts();
   }, [location.search, currentPage]);
 
+  useEffect(() => {
+    setFilters({
+      search: queryParams.get('search') || '',
+      gender: queryParams.get('gender') || '',
+      categoryId: queryParams.get('category') || '',
+      minPrice: '',
+      maxPrice: '',
+      brands: [],
+      sizes: [],
+      colors: [],
+      inStock: false,
+      newArrivals: queryParams.get('newArrivals') === 'true' || false,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    });
+    setCurrentPage(0);
+  }, [location.search]);
+
   const fetchCategoriesAndBrands = async () => {
     try {
       const [catRes, brandRes] = await Promise.all([
@@ -75,40 +93,10 @@ const Products = () => {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      // Use mock data if API fails
-      setProducts(getMockProducts());
+      setProducts([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getMockProducts = () => {
-    const mockProducts = [
-      { id: 1, name: 'Floral Summer Dress', price: 4590, salePrice: 3290, mainImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400', slug: 'floral-summer-dress', brand: 'LankaThread', gender: 'WOMEN', sizes: ['S', 'M', 'L'], colors: ['Pink', 'Blue'], stockQuantity: 15, isNewArrival: true, category: { name: 'Dresses' } },
-      { id: 2, name: 'Classic Linen Shirt', price: 3890, mainImage: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400', slug: 'classic-linen-shirt', brand: 'LankaThread', gender: 'MEN', sizes: ['M', 'L', 'XL'], colors: ['White', 'Blue'], stockQuantity: 20, isNewArrival: false, category: { name: 'Shirts' } },
-      { id: 3, name: 'Kids Cotton T-Shirt', price: 1890, mainImage: 'https://images.unsplash.com/photo-1519278407-7e5f4b54cc6a?w=400', slug: 'kids-cotton-tshirt', brand: 'LankaThread', gender: 'KIDS', sizes: ['XS', 'S', 'M'], colors: ['Red', 'Yellow', 'Green'], stockQuantity: 30, isNewArrival: true, category: { name: 'T-Shirts' } },
-      { id: 4, name: 'Teen Denim Jacket', price: 5990, salePrice: 4590, mainImage: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400', slug: 'teen-denim-jacket', brand: 'LankaThread', gender: 'TEENS', sizes: ['S', 'M', 'L'], colors: ['Blue'], stockQuantity: 8, isNewArrival: false, category: { name: 'Jackets' } },
-      { id: 5, name: 'Traditional Saree', price: 12500, mainImage: 'https://images.unsplash.com/photo-1583391733951-8f1cb5da7574?w=400', slug: 'traditional-saree', brand: 'Heritage', gender: 'WOMEN', sizes: ['Free Size'], colors: ['Red', 'Gold'], stockQuantity: 5, isNewArrival: true, category: { name: 'Sarees' } },
-      { id: 6, name: 'Casual Polo Shirt', price: 2890, mainImage: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400', slug: 'casual-polo-shirt', brand: 'LankaThread', gender: 'MEN', sizes: ['S', 'M', 'L', 'XL'], colors: ['Black', 'White', 'Navy'], stockQuantity: 25, isNewArrival: false, category: { name: 'Polo Shirts' } },
-      { id: 7, name: 'Elegant Kurti', price: 4590, mainImage: 'https://images.unsplash.com/photo-1610030465003-7c65e3d6d681?w=400', slug: 'elegant-kurti', brand: 'Heritage', gender: 'WOMEN', sizes: ['S', 'M', 'L', 'XL'], colors: ['Green', 'Purple'], stockQuantity: 12, isNewArrival: true, category: { name: 'Kurtis' } },
-      { id: 8, name: 'Beach Shorts', price: 2290, mainImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400', slug: 'beach-shorts', brand: 'LankaThread', gender: 'MEN', sizes: ['S', 'M', 'L'], colors: ['Blue', 'Green'], stockQuantity: 18, isNewArrival: false, category: { name: 'Shorts' } },
-      { id: 9, name: 'Party Wear Gown', price: 8500, mainImage: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400', slug: 'party-wear-gown', brand: 'LankaThread', gender: 'WOMEN', sizes: ['S', 'M', 'L'], colors: ['Black', 'Red'], stockQuantity: 6, isNewArrival: true, category: { name: 'Gowns' } },
-      { id: 10, name: 'School Uniform Set', price: 3500, mainImage: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', slug: 'school-uniform-set', brand: 'LankaThread', gender: 'KIDS', sizes: ['XS', 'S', 'M', 'L'], colors: ['White', 'Navy'], stockQuantity: 40, isNewArrival: false, category: { name: 'Uniforms' } },
-      { id: 11, name: 'Winter Hoodie', price: 4200, salePrice: 3500, mainImage: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400', slug: 'winter-hoodie', brand: 'LankaThread', gender: 'TEENS', sizes: ['S', 'M', 'L', 'XL'], colors: ['Black', 'Grey', 'Blue'], stockQuantity: 14, isNewArrival: false, category: { name: 'Hoodies' } },
-      { id: 12, name: 'Cotton Salwar', price: 3800, mainImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400', slug: 'cotton-salwar', brand: 'Heritage', gender: 'WOMEN', sizes: ['S', 'M', 'L', 'XL'], colors: ['Pink', 'Blue', 'Green'], stockQuantity: 10, isNewArrival: true, category: { name: 'Salwar' } },
-    ];
-
-    let filtered = mockProducts;
-    if (filters.gender) {
-      filtered = filtered.filter(p => p.gender === filters.gender);
-    }
-    if (filters.search) {
-      filtered = filtered.filter(p => p.name.toLowerCase().includes(filters.search.toLowerCase()));
-    }
-    if (filters.newArrivals) {
-      filtered = filtered.filter(p => p.isNewArrival);
-    }
-    return filtered;
   };
 
   const handleFilterChange = (key, value) => {

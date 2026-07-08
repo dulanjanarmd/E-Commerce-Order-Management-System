@@ -71,53 +71,7 @@ const Wishlist = () => {
     }
   };
 
-  const mockWishlist = [
-    {
-      id: 1,
-      product: {
-        id: 1,
-        name: 'Floral Summer Dress',
-        slug: 'floral-summer-dress',
-        price: 4590,
-        salePrice: 3290,
-        mainImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400',
-        brand: 'LankaThread',
-        sizes: ['S', 'M', 'L'],
-        colors: ['Pink', 'Blue'],
-        stockQuantity: 15
-      }
-    },
-    {
-      id: 2,
-      product: {
-        id: 5,
-        name: 'Traditional Saree',
-        slug: 'traditional-saree',
-        price: 12500,
-        mainImage: 'https://images.unsplash.com/photo-1583391733951-8f1cb5da7574?w=400',
-        brand: 'Heritage',
-        sizes: ['Free Size'],
-        colors: ['Red', 'Gold'],
-        stockQuantity: 5
-      }
-    },
-    {
-      id: 3,
-      product: {
-        id: 7,
-        name: 'Elegant Kurti',
-        slug: 'elegant-kurti',
-        price: 4590,
-        mainImage: 'https://images.unsplash.com/photo-1610030465003-7c65e3d6d681?w=400',
-        brand: 'Heritage',
-        sizes: ['S', 'M', 'L', 'XL'],
-        colors: ['Green', 'Purple'],
-        stockQuantity: 12
-      }
-    }
-  ];
-
-  const displayItems = wishlistItems.length > 0 ? wishlistItems : mockWishlist;
+  const displayItems = wishlistItems;
 
   if (loading) {
     return (

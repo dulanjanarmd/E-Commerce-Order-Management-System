@@ -1,9 +1,11 @@
 package com.lankathread.service;
 
 import com.lankathread.dto.ApiResponse;
+import com.lankathread.dto.ForgotPasswordRequest;
 import com.lankathread.dto.JwtResponse;
 import com.lankathread.dto.LoginRequest;
 import com.lankathread.dto.RegisterRequest;
+import com.lankathread.dto.ResetPasswordRequest;
 import com.lankathread.dto.UserProfileResponse;
 import com.lankathread.model.User;
 import com.lankathread.repository.UserRepository;
@@ -15,6 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -30,6 +35,9 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private EmailService emailService;
 
     public ApiResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -96,5 +104,43 @@ public class UserService {
         return ApiResponse.success("Google login successful",
                 new JwtResponse(token, user.getId(), user.getFullName(), user.getEmail(),
                         user.getRole().name(), user.getProfileImage()));
+    }
+
+    public ApiResponse forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElse(null);
+
+        if (user == null) {
+            return ApiResponse.success("If an account exists with this email, a password reset link has been sent.", null);
+        }
+
+        String resetToken = UUID.randomUUID().toString();
+        user.setResetToken(resetToken);
+        user.setResetTokenExpiry(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), resetToken);
+
+        return ApiResponse.success("If an account exists with this email, a password reset link has been sent.", null);
+    }
+
+    public ApiResponse resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetToken(request.getToken())
+                .orElse(null);
+
+        if (user == null) {
+            return ApiResponse.error("Invalid or expired reset token");
+        }
+
+        if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            return ApiResponse.error("Reset token has expired. Please request a new password reset.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return ApiResponse.success("Password has been reset successfully. You can now login with your new password.", null);
     }
 }

@@ -32,19 +32,8 @@ const Home = () => {
     }
   };
 
-  const defaultProducts = [
-    { id: 1, name: 'Floral Summer Dress', price: 4590, salePrice: 3290, mainImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400', slug: 'floral-summer-dress', brand: 'LankaThread', isNewArrival: true },
-    { id: 2, name: 'Classic Linen Shirt', price: 3890, mainImage: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400', slug: 'classic-linen-shirt', brand: 'LankaThread', isNewArrival: false },
-    { id: 3, name: 'Kids Cotton T-Shirt', price: 1890, mainImage: 'https://images.unsplash.com/photo-1519278407-7e5f4b54cc6a?w=400', slug: 'kids-cotton-tshirt', brand: 'LankaThread', isNewArrival: true },
-    { id: 4, name: 'Teen Denim Jacket', price: 5990, salePrice: 4590, mainImage: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400', slug: 'teen-denim-jacket', brand: 'LankaThread', isNewArrival: false },
-    { id: 5, name: 'Traditional Saree', price: 12500, mainImage: 'https://images.unsplash.com/photo-1583391733951-8f1cb5da7574?w=400', slug: 'traditional-saree', brand: 'Heritage', isNewArrival: true },
-    { id: 6, name: 'Casual Polo Shirt', price: 2890, mainImage: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400', slug: 'casual-polo-shirt', brand: 'LankaThread', isNewArrival: false },
-    { id: 7, name: 'Elegant Kurti', price: 4590, mainImage: 'https://images.unsplash.com/photo-1610030465003-7c65e3d6d681?w=400', slug: 'elegant-kurti', brand: 'Heritage', isNewArrival: true },
-    { id: 8, name: 'Beach Shorts', price: 2290, mainImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400', slug: 'beach-shorts', brand: 'LankaThread', isNewArrival: false },
-  ];
-
-  const displayFeatured = featuredProducts.length > 0 ? featuredProducts : defaultProducts.slice(0, 4);
-  const displayArrivals = newArrivals.length > 0 ? newArrivals : defaultProducts.slice(4);
+  const displayFeatured = featuredProducts;
+  const displayArrivals = newArrivals;
 
   return (
     <div>
@@ -84,22 +73,17 @@ const Home = () => {
             <p className="section-subtitle">Find exactly what you are looking for</p>
           </div>
           <Row className="g-4">
-            {[
-              { name: 'Women', slug: 'WOMEN', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400', count: '250+' },
-              { name: 'Men', slug: 'MEN', image: 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400', count: '180+' },
-              { name: 'Kids', slug: 'KIDS', image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', count: '120+' },
-              { name: 'Teens', slug: 'TEENS', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', count: '90+' },
-            ].map((cat, idx) => (
-              <Col key={idx} xs={6} md={3}>
-                <Link to={`/products?gender=${cat.slug}`} className="category-card-link">
+            {categories.map((cat, idx) => (
+              <Col key={cat.id || idx} xs={6} md={3}>
+                <Link to={`/products?gender=${cat.slug.toUpperCase()}`} className="category-card-link">
                   <div className="category-card">
                     <div className="category-img-wrapper">
-                      <img src={cat.image} alt={cat.name} className="category-img" />
+                      <img src={cat.imageUrl || 'https://via.placeholder.com/400?text=No+Image'} alt={cat.name} className="category-img" />
                       <div className="category-overlay"></div>
                     </div>
                     <div className="category-info">
                       <h4 className="category-name">{cat.name}</h4>
-                      <span className="category-count">{cat.count} Products</span>
+                      <span className="category-count">Shop Now</span>
                     </div>
                   </div>
                 </Link>

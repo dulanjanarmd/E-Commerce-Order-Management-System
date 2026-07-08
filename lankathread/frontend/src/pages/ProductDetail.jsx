@@ -33,7 +33,7 @@ const ProductDetail = () => {
         if (prod.sizes?.length > 0) setSelectedSize(prod.sizes[0]);
         if (prod.colors?.length > 0) setSelectedColor(prod.colors[0]);
         setSelectedImage(0);
-        
+
         // Fetch related products
         const relatedRes = await productAPI.getByCategory(prod.category?.id);
         if (relatedRes.data.success) {
@@ -42,47 +42,12 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error('Error fetching product:', error);
-      // Use mock data
-      const mockProduct = getMockProduct();
-      setProduct(mockProduct);
-      if (mockProduct.sizes?.length > 0) setSelectedSize(mockProduct.sizes[0]);
-      if (mockProduct.colors?.length > 0) setSelectedColor(mockProduct.colors[0]);
+      setProduct(null);
       setRelatedProducts([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const getMockProduct = () => ({
-    id: 1,
-    name: 'Floral Summer Dress',
-    slug: 'floral-summer-dress',
-    description: 'A beautiful floral summer dress perfect for the Sri Lankan climate. Made from lightweight, breathable cotton fabric with a flattering A-line silhouette. Features a V-neckline, short flutter sleeves, and a comfortable elastic waistband. The vibrant floral print adds a touch of tropical elegance.',
-    price: 4590,
-    salePrice: 3290,
-    mainImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600',
-    images: [
-      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600',
-      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600',
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600',
-      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600'
-    ],
-    brand: 'LankaThread',
-    gender: 'WOMEN',
-    category: { name: 'Dresses' },
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Pink', 'Blue', 'White'],
-    material: '100% Cotton',
-    careInstructions: 'Machine wash cold, gentle cycle. Do not bleach. Tumble dry low. Iron on low heat if needed.',
-    stockQuantity: 15,
-    sizeStock: [
-      { size: 'S', stock: 5 },
-      { size: 'M', stock: 8 },
-      { size: 'L', stock: 2 },
-      { size: 'XL', stock: 0 }
-    ],
-    isNewArrival: true
-  });
 
   const handleAddToCart = async () => {
     if (!user) {

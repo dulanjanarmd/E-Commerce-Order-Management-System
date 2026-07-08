@@ -58,6 +58,16 @@ public class AuthController {
                 request.getEmail(), request.getFullName(), request.getGoogleId(), request.getProfileImage()));
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(userService.forgotPassword(request));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(userService.resetPassword(request));
+    }
+
     @Data
     public static class GoogleLoginRequest {
         private String email;

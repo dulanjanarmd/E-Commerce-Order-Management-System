@@ -95,6 +95,11 @@ const Login = () => {
                     placeholder="Enter your password"
                     required
                   />
+                  <div className="text-end mt-2">
+                    <Link to="/forgot-password" className="forgot-password-link">
+                      Forgot Password?
+                    </Link>
+                  </div>
                 </Form.Group>
 
                 <Button 

@@ -3,10 +3,10 @@
 
 -- Categories
 INSERT INTO categories (name, slug, description, image_url, display_order, active) VALUES
-('Women', 'women', 'Elegant fashion for women including sarees, dresses, kurtis, and more', NULL, 1, true),
-('Men', 'men', 'Stylish menswear including shirts, t-shirts, trousers, and accessories', NULL, 2, true),
-('Kids', 'kids', 'Adorable clothing for kids aged 2-12 years', NULL, 3, true),
-('Teens', 'teens', 'Trendy fashion for teenagers', NULL, 4, true);
+('Women', 'women', 'Elegant fashion for women including sarees, dresses, kurtis, and more', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400', 1, true),
+('Men', 'men', 'Stylish menswear including shirts, t-shirts, trousers, and accessories', 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400', 2, true),
+('Kids', 'kids', 'Adorable clothing for kids aged 2-12 years', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', 3, true),
+('Teens', 'teens', 'Trendy fashion for teenagers', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', 4, true);
 
 -- Subcategories for Women
 INSERT INTO categories (name, slug, description, parent_id, display_order, active) VALUES
@@ -30,19 +30,19 @@ INSERT INTO categories (name, slug, description, parent_id, display_order, activ
 ('School Wear', 'school-wear', 'School uniforms and accessories', 3, 4, true);
 
 -- Sample Products
-INSERT INTO products (name, slug, description, price, sale_price, category_id, sub_category, brand, gender, material, care_instructions, stock_quantity, is_new_arrival, is_featured, is_active, created_at, updated_at) VALUES
-('Floral Summer Dress', 'floral-summer-dress', 'A beautiful floral summer dress perfect for the Sri Lankan climate. Made from lightweight, breathable cotton fabric with a flattering A-line silhouette.', 4590, 3290, 2, 'Dresses', 'LankaThread', 'WOMEN', '100% Cotton', 'Machine wash cold, gentle cycle. Do not bleach.', 15, true, true, true, NOW(), NOW()),
-('Classic Linen Shirt', 'classic-linen-shirt', 'Premium quality linen shirt perfect for tropical weather. Breathable and comfortable for all-day wear.', 3890, NULL, 5, 'Shirts', 'LankaThread', 'MEN', '100% Linen', 'Machine wash cold. Iron on low heat.', 20, false, true, true, NOW(), NOW()),
-('Kids Tropical T-Shirt', 'kids-tropical-tshirt', 'Fun and colorful tropical print t-shirt for kids. Soft cotton fabric that is gentle on sensitive skin.', 1890, NULL, 9, 'T-Shirts', 'LankaThread', 'KIDS', '100% Cotton', 'Machine wash cold. Tumble dry low.', 30, true, false, true, NOW(), NOW()),
-('Teen Denim Jacket', 'teen-denim-jacket', 'Stylish denim jacket with modern patches and distressed details. Perfect for layering.', 5990, 4590, 4, 'Jackets', 'LankaThread', 'TEENS', 'Denim', 'Machine wash cold. Do not bleach.', 8, false, true, true, NOW(), NOW()),
-('Traditional Kandyan Saree', 'traditional-kandyan-saree', 'Exquisite handwoven Kandyan saree in rich colors with traditional motifs. Perfect for weddings and special occasions.', 12500, NULL, 1, 'Sarees', 'Heritage', 'WOMEN', 'Silk Blend', 'Dry clean only.', 5, true, true, true, NOW(), NOW()),
-('Emerald Embroidered Kurti', 'emerald-embroidered-kurti', 'Elegant emerald green kurti with delicate gold embroidery. Perfect for festive occasions and casual wear.', 4590, NULL, 3, 'Kurtis', 'Heritage', 'WOMEN', 'Cotton Silk Blend', 'Machine wash cold, gentle cycle.', 12, true, false, true, NOW(), NOW()),
-('Casual Polo Shirt', 'casual-polo-shirt', 'Classic polo shirt in versatile colors. Comfortable fit for everyday wear.', 2890, NULL, 6, 'T-Shirts', 'LankaThread', 'MEN', 'Cotton Pique', 'Machine wash cold.', 25, false, false, true, NOW(), NOW()),
-('Beach Shorts', 'beach-shorts', 'Lightweight and quick-dry beach shorts perfect for Sri Lankan beaches.', 2290, NULL, 8, 'Shorts', 'LankaThread', 'MEN', 'Polyester Blend', 'Machine wash cold.', 18, false, false, true, NOW(), NOW()),
-('Party Wear Gown', 'party-wear-gown', 'Stunning evening gown for special occasions. Elegant design with flowing silhouette.', 8500, 7200, 2, 'Dresses', 'LankaThread', 'WOMEN', 'Chiffon', 'Dry clean only.', 6, true, true, true, NOW(), NOW()),
-('School Uniform Set', 'school-uniform-set', 'Complete school uniform set including shirt, shorts/skirt, and tie. Durable fabric for daily wear.', 3500, NULL, 11, 'School Wear', 'LankaThread', 'KIDS', 'Polyester Cotton', 'Machine wash cold.', 40, false, false, true, NOW(), NOW()),
-('Winter Hoodie', 'winter-hoodie', 'Cozy fleece-lined hoodie for cooler days. Available in trendy colors.', 4200, 3500, 4, 'Hoodies', 'LankaThread', 'TEENS', 'Cotton Fleece', 'Machine wash cold.', 14, false, true, true, NOW(), NOW()),
-('Cotton Salwar Kameez', 'cotton-salwar-kameez', 'Comfortable and elegant cotton salwar kameez set. Perfect for daily wear.', 3800, NULL, 3, 'Kurtis', 'Heritage', 'WOMEN', '100% Cotton', 'Machine wash cold.', 10, true, false, true, NOW(), NOW());
+INSERT INTO products (name, slug, description, price, sale_price, category_id, sub_category, brand, gender, material, care_instructions, stock_quantity, is_new_arrival, is_featured, is_active, main_image, created_at, updated_at) VALUES
+('Floral Summer Dress', 'floral-summer-dress', 'A beautiful floral summer dress perfect for the Sri Lankan climate. Made from lightweight, breathable cotton fabric with a flattering A-line silhouette.', 4590, 3290, 2, 'Dresses', 'LankaThread', 'WOMEN', '100% Cotton', 'Machine wash cold, gentle cycle. Do not bleach.', 15, true, true, true, 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400', NOW(), NOW()),
+('Classic Linen Shirt', 'classic-linen-shirt', 'Premium quality linen shirt perfect for tropical weather. Breathable and comfortable for all-day wear.', 3890, NULL, 5, 'Shirts', 'LankaThread', 'MEN', '100% Linen', 'Machine wash cold. Iron on low heat.', 20, false, true, true, 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400', NOW(), NOW()),
+('Kids Tropical T-Shirt', 'kids-tropical-tshirt', 'Fun and colorful tropical print t-shirt for kids. Soft cotton fabric that is gentle on sensitive skin.', 1890, NULL, 9, 'T-Shirts', 'LankaThread', 'KIDS', '100% Cotton', 'Machine wash cold. Tumble dry low.', 30, true, false, true, 'https://images.unsplash.com/photo-1519278407-7e5f4b54cc6a?w=400', NOW(), NOW()),
+('Teen Denim Jacket', 'teen-denim-jacket', 'Stylish denim jacket with modern patches and distressed details. Perfect for layering.', 5990, 4590, 4, 'Jackets', 'LankaThread', 'TEENS', 'Denim', 'Machine wash cold. Do not bleach.', 8, false, true, true, 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400', NOW(), NOW()),
+('Traditional Kandyan Saree', 'traditional-kandyan-saree', 'Exquisite handwoven Kandyan saree in rich colors with traditional motifs. Perfect for weddings and special occasions.', 12500, NULL, 1, 'Sarees', 'Heritage', 'WOMEN', 'Silk Blend', 'Dry clean only.', 5, true, true, true, 'https://images.unsplash.com/photo-1583391733951-8f1cb5da7574?w=400', NOW(), NOW()),
+('Emerald Embroidered Kurti', 'emerald-embroidered-kurti', 'Elegant emerald green kurti with delicate gold embroidery. Perfect for festive occasions and casual wear.', 4590, NULL, 3, 'Kurtis', 'Heritage', 'WOMEN', 'Cotton Silk Blend', 'Machine wash cold, gentle cycle.', 12, true, false, true, 'https://images.unsplash.com/photo-1610030465003-7c65e3d6d681?w=400', NOW(), NOW()),
+('Casual Polo Shirt', 'casual-polo-shirt', 'Classic polo shirt in versatile colors. Comfortable fit for everyday wear.', 2890, NULL, 6, 'T-Shirts', 'LankaThread', 'MEN', 'Cotton Pique', 'Machine wash cold.', 25, false, false, true, 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400', NOW(), NOW()),
+('Beach Shorts', 'beach-shorts', 'Lightweight and quick-dry beach shorts perfect for Sri Lankan beaches.', 2290, NULL, 8, 'Shorts', 'LankaThread', 'MEN', 'Polyester Blend', 'Machine wash cold.', 18, false, false, true, 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400', NOW(), NOW()),
+('Party Wear Gown', 'party-wear-gown', 'Stunning evening gown for special occasions. Elegant design with flowing silhouette.', 8500, 7200, 2, 'Dresses', 'LankaThread', 'WOMEN', 'Chiffon', 'Dry clean only.', 6, true, true, true, 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400', NOW(), NOW()),
+('School Uniform Set', 'school-uniform-set', 'Complete school uniform set including shirt, shorts/skirt, and tie. Durable fabric for daily wear.', 3500, NULL, 11, 'School Wear', 'LankaThread', 'KIDS', 'Polyester Cotton', 'Machine wash cold.', 40, false, false, true, 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', NOW(), NOW()),
+('Winter Hoodie', 'winter-hoodie', 'Cozy fleece-lined hoodie for cooler days. Available in trendy colors.', 4200, 3500, 4, 'Hoodies', 'LankaThread', 'TEENS', 'Cotton Fleece', 'Machine wash cold.', 14, false, true, true, 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400', NOW(), NOW()),
+('Cotton Salwar Kameez', 'cotton-salwar-kameez', 'Comfortable and elegant cotton salwar kameez set. Perfect for daily wear.', 3800, NULL, 3, 'Kurtis', 'Heritage', 'WOMEN', '100% Cotton', 'Machine wash cold.', 10, true, false, true, 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400', NOW(), NOW());
 
 -- Product Sizes
 INSERT INTO product_sizes (product_id, size) VALUES
