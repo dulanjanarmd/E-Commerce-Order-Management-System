@@ -7,7 +7,7 @@ import api, { orderAPI, productAPI, categoryAPI, promotionAPI } from '../service
 import { toast } from 'react-toastify';
 
 const AdminDashboard = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -53,6 +53,7 @@ const AdminDashboard = () => {
   const [promotions, setPromotions] = useState([]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/login');
       return;
@@ -62,7 +63,7 @@ const AdminDashboard = () => {
       return;
     }
     fetchData();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchData = async () => {
     try {
@@ -394,7 +395,7 @@ const AdminDashboard = () => {
               <button className={`nav-link ${activeTab === 'promotions' ? 'active' : ''}`} onClick={() => setActiveTab('promotions')}>
                 <FiTag className="me-2" /> Promotions
               </button>
-              <button className={`nav-link ${activeTab === 'customers' ? 'active' : ''}`} onClick={() => setActiveTab('customers')}>
+              <button className={`nav-link ${activeTab === 'customers' ? 'active' : ''}`} onClick={() => window.location.href = '/admin/customers'}>
                 <FiUsers className="me-2" /> Customers
               </button>
             </nav>
@@ -593,7 +594,7 @@ const AdminDashboard = () => {
             <div>
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h4 className="mb-0">Product Management</h4>
-                <Button className="btn-primary-custom" onClick={() => openProductModal(null)}>
+                <Button className="btn-primary-custom" onClick={() => navigate('/admin/products/add')}>
                   <FiPlus className="me-2" /> Add Product
                 </Button>
               </div>
@@ -673,7 +674,7 @@ const AdminDashboard = () => {
                               )}
                             </td>
                             <td>
-                              <Button variant="link" className="p-0 me-1" onClick={() => openProductModal(product)} title="Edit">
+                              <Button variant="link" className="p-0 me-1" onClick={() => navigate(`/admin/products/edit/${product.id}`)} title="Edit">
                                 <FiEdit2 size={16} />
                               </Button>
                               <Button variant="link" className="p-0 me-1" onClick={() => navigate(`/products/${product.slug}`)} title="View">

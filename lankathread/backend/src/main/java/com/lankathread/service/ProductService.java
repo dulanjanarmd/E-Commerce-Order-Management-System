@@ -100,9 +100,17 @@ public class ProductService {
     }
 
     public ApiResponse createProduct(Product product) {
+        // Auto-generate slug if not provided
+        if (product.getSlug() == null || product.getSlug().isBlank()) {
+            product.setSlug(generateSlug(product.getName()));
+        }
         // Auto-set active status based on stock
         if (product.getStockQuantity() != null && product.getStockQuantity() <= 0) {
             product.setIsActive(false);
+        }
+        // Set variants parent reference
+        if (product.getVariants() != null) {
+            product.getVariants().forEach(v -> v.setProduct(product));
         }
         Product saved = productRepository.save(product);
         return ApiResponse.success("Product created", saved);
@@ -112,7 +120,12 @@ public class ProductService {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         existing.setName(product.getName());
-        existing.setSlug(product.getSlug());
+        if (product.getSlug() != null && !product.getSlug().isBlank()) {
+            existing.setSlug(product.getSlug());
+        } else {
+            existing.setSlug(generateSlug(product.getName()));
+        }
+        existing.setShortDescription(product.getShortDescription());
         existing.setDescription(product.getDescription());
         existing.setPrice(product.getPrice());
         existing.setSalePrice(product.getSalePrice());
@@ -124,15 +137,33 @@ public class ProductService {
         existing.setColors(product.getColors());
         existing.setImages(product.getImages());
         existing.setMainImage(product.getMainImage());
+        existing.setVideoUrl(product.getVideoUrl());
         existing.setMaterial(product.getMaterial());
         existing.setCareInstructions(product.getCareInstructions());
         existing.setStockQuantity(product.getStockQuantity());
+        existing.setLowStockThreshold(product.getLowStockThreshold());
         existing.setSizeStock(product.getSizeStock());
+        existing.setSku(product.getSku());
         existing.setIsNewArrival(product.getIsNewArrival());
         existing.setIsFeatured(product.getIsFeatured());
         existing.setBarcode(product.getBarcode());
         existing.setStoreLocation(product.getStoreLocation());
+        existing.setWeight(product.getWeight());
+        existing.setDimensions(product.getDimensions());
+        existing.setMetaTitle(product.getMetaTitle());
+        existing.setMetaDescription(product.getMetaDescription());
+        existing.setSeason(product.getSeason());
+        existing.setTags(product.getTags());
+        existing.setAttributes(product.getAttributes());
         existing.setIsArchived(product.getIsArchived());
+        // Handle variants: clear old, set new with parent reference
+        if (product.getVariants() != null) {
+            existing.getVariants().clear();
+            product.getVariants().forEach(v -> {
+                v.setProduct(existing);
+                existing.getVariants().add(v);
+            });
+        }
         // Auto-set active status based on stock: if stock is 0 or less, deactivate; if stock > 0 and not archived, activate
         if (!Boolean.TRUE.equals(existing.getIsArchived())) {
             if (existing.getStockQuantity() != null && existing.getStockQuantity() <= 0) {
@@ -168,6 +199,17 @@ public class ProductService {
         product.setIsArchived(false);
         product.setIsActive(true);
         productRepository.save(product);
-        return ApiResponse.success("Product unarchived and activated");
+        return ApiResponse.success("Product unarchived and activated", product);
+    }
+
+    private String generateSlug(String name) {
+        if (name == null) return "product-" + System.currentTimeMillis();
+        String slug = name.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("[\\s]+", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
+        if (slug.isEmpty()) slug = "product-" + System.currentTimeMillis();
+        return slug;
     }
 }

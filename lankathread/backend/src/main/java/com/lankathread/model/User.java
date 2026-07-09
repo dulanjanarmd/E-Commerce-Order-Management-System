@@ -49,6 +49,18 @@ public class User {
     @Column(name = "reset_token_expiry")
     private LocalDateTime resetTokenExpiry;
 
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+    @Column(name = "date_of_birth")
+    private LocalDateTime dateOfBirth;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CartItem> cartItems;
     

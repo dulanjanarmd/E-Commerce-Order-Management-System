@@ -19,6 +19,9 @@ import Orders from './pages/Orders'
 import Wishlist from './pages/Wishlist'
 import AdminDashboard from './pages/AdminDashboard'
 import CategoryManagement from './pages/CategoryManagement'
+import AddProduct from './pages/AddProduct'
+import CustomerManagement from './pages/CustomerManagement'
+import CustomerDetail from './pages/CustomerDetail'
 
 function App() {
   return (
@@ -42,6 +45,10 @@ function App() {
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/categories" element={<CategoryManagement />} />
+              <Route path="/admin/products/add" element={<AddProduct />} />
+              <Route path="/admin/products/edit/:id" element={<AddProduct />} />
+              <Route path="/admin/customers" element={<CustomerManagement />} />
+              <Route path="/admin/customers/:id" element={<CustomerDetail />} />
             </Routes>
           </main>
           <Footer />

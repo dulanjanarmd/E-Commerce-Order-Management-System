@@ -7,7 +7,7 @@ import { categoryAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
 const CategoryManagement = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [parentCategories, setParentCategories] = useState([]);
@@ -24,6 +24,7 @@ const CategoryManagement = () => {
   });
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
     if (!user) {
       navigate('/login');
       return;
@@ -33,7 +34,7 @@ const CategoryManagement = () => {
       return;
     }
     fetchCategories();
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchCategories = async () => {
     try {

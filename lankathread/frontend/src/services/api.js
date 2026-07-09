@@ -52,7 +52,13 @@ export const productAPI = {
   search: (query) => api.get(`/products/search?query=${query}`),
   getBrands: () => api.get('/products/brands'),
   create: (data) => api.post('/products', data),
+  createWithImages: (formData) => api.post('/products/with-images', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
   update: (id, data) => api.put(`/products/${id}`, data),
+  updateWithImages: (id, formData) => api.put(`/products/${id}/with-images`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
   delete: (id) => api.delete(`/products/${id}`)
 };
 
@@ -105,4 +111,20 @@ export const promotionAPI = {
   create: (data) => api.post('/promotions', data),
   update: (id, data) => api.put(`/promotions/${id}`, data),
   delete: (id) => api.delete(`/promotions/${id}`)
+};
+
+// Customer APIs (Admin)
+export const customerAPI = {
+  getAll: (keyword, isActive) => {
+    let params = [];
+    if (keyword) params.push(`keyword=${encodeURIComponent(keyword)}`);
+    if (isActive !== null && isActive !== undefined) params.push(`isActive=${isActive}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return api.get(`/admin/customers${query}`);
+  },
+  getById: (id) => api.get(`/admin/customers/${id}`),
+  update: (id, data) => api.put(`/admin/customers/${id}`, data),
+  toggleBlock: (id) => api.put(`/admin/customers/${id}/toggle-block`),
+  create: (data) => api.post('/admin/customers', data),
+  getStats: () => api.get('/admin/customers/stats')
 };

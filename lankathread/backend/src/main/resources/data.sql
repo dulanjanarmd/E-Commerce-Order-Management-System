@@ -6,7 +6,8 @@ INSERT INTO categories (name, slug, description, image_url, display_order, is_pi
 ('Women', 'women', 'Elegant fashion for women including sarees, dresses, kurtis, and more', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400', 1, true, 1, true),
 ('Men', 'men', 'Stylish menswear including shirts, t-shirts, trousers, and accessories', 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400', 2, true, 2, true),
 ('Kids', 'kids', 'Adorable clothing for kids aged 2-12 years', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', 3, true, 3, true),
-('Teens', 'teens', 'Trendy fashion for teenagers', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', 4, true, 4, true);
+('Teens', 'teens', 'Trendy fashion for teenagers', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', 4, true, 4, true),
+('New Arrivals', 'new-arrivals', 'Latest additions to our collection', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400', 5, true, 5, true);
 
 -- Subcategories for Women
 INSERT INTO categories (name, slug, description, parent_id, display_order, active) VALUES
@@ -88,3 +89,76 @@ INSERT INTO product_size_stock (product_id, size, stock) VALUES
 (10, 'XS', 15), (10, 'S', 12), (10, 'M', 10), (10, 'L', 3),
 (11, 'S', 4), (11, 'M', 6), (11, 'L', 3), (11, 'XL', 1),
 (12, 'S', 3), (12, 'M', 4), (12, 'L', 2), (12, 'XL', 1);
+
+-- Product Tags
+INSERT INTO product_tags (product_id, tag) VALUES
+(1, 'summer'), (1, 'floral'), (1, 'casual'), (1, 'cotton'),
+(2, 'formal'), (2, 'linen'), (2, 'office-wear'),
+(3, 'kids'), (3, 'casual'), (3, 'cotton'), (3, 'fun-print'),
+(4, 'denim'), (4, 'jacket'), (4, 'trendy'),
+(5, 'traditional'), (5, 'saree'), (5, 'wedding'), (5, 'silk'),
+(6, 'kurti'), (6, 'embroidered'), (6, 'festive'),
+(7, 'polo'), (7, 'casual'), (7, 'cotton'),
+(8, 'beach'), (8, 'shorts'), (8, 'summer'),
+(9, 'gown'), (9, 'party'), (9, 'evening-wear'),
+(10, 'school'), (10, 'uniform'), (10, 'kids'),
+(11, 'hoodie'), (11, 'winter'), (11, 'fleece'),
+(12, 'salwar'), (12, 'traditional'), (12, 'cotton');
+
+-- Product Attributes (custom key-value pairs)
+INSERT INTO product_attributes (product_id, attr_key, attr_value) VALUES
+(1, 'Neckline', 'V-Neck'), (1, 'Sleeve Length', 'Sleeveless'), (1, 'Pattern', 'Floral Print'),
+(2, 'Collar', 'Spread Collar'), (2, 'Sleeve Type', 'Full Sleeve'), (2, 'Fit', 'Regular Fit'),
+(3, 'Neckline', 'Round Neck'), (3, 'Sleeve Length', 'Half Sleeve'), (3, 'Pattern', 'Tropical Print'),
+(4, 'Closure', 'Button Front'), (4, 'Wash', 'Medium Wash'), (4, 'Fit', 'Slim Fit'),
+(5, 'Blouse Piece', 'Included'), (5, 'Length', '5.5 meters'), (5, 'Occasion', 'Wedding/Festive'),
+(6, 'Neckline', 'Round Neck'), (6, 'Sleeve Length', 'Three-Quarter'), (6, 'Work Type', 'Gold Embroidery'),
+(7, 'Collar', 'Polo Collar'), (7, 'Fit', 'Regular Fit'), (7, 'Pattern', 'Solid'),
+(8, 'Waistband', 'Elastic'), (8, 'Length', 'Above Knee'), (8, 'Feature', 'Quick Dry'),
+(9, 'Length', 'Floor Length'), (9, 'Closure', 'Zipper Back'), (9, 'Occasion', 'Evening/Party'),
+(10, 'Includes', 'Shirt + Shorts + Tie'), (10, 'Age Group', '6-12 years'),
+(11, 'Hood', 'Drawstring Hood'), (11, 'Pocket', 'Kangaroo Pocket'), (11, 'Fit', 'Regular Fit'),
+(12, 'Includes', 'Kameez + Salwar + Dupatta'), (12, 'Occasion', 'Daily Wear');
+
+-- Product Variants (Color + Size combinations)
+INSERT INTO product_variants (product_id, color, size, price, stock_quantity, sku, is_active) VALUES
+-- Floral Summer Dress variants
+(1, 'Pink', 'S', 4590, 5, 'FSD-PNK-S', true),
+(1, 'Pink', 'M', 4590, 8, 'FSD-PNK-M', true),
+(1, 'Pink', 'L', 4590, 2, 'FSD-PNK-L', true),
+(1, 'Blue', 'S', 4590, 3, 'FSD-BLU-S', true),
+(1, 'Blue', 'M', 4590, 4, 'FSD-BLU-M', true),
+(1, 'Blue', 'L', 4590, 1, 'FSD-BLU-L', true),
+-- Classic Linen Shirt variants
+(2, 'White', 'M', 3890, 10, 'CLS-WHT-M', true),
+(2, 'White', 'L', 3890, 7, 'CLS-WHT-L', true),
+(2, 'White', 'XL', 3890, 3, 'CLS-WHT-XL', true),
+(2, 'Blue', 'M', 3890, 5, 'CLS-BLU-M', true),
+(2, 'Blue', 'L', 3890, 4, 'CLS-BLU-L', true),
+-- Casual Polo Shirt variants
+(7, 'Black', 'S', 2890, 8, 'CPS-BLK-S', true),
+(7, 'Black', 'M', 2890, 10, 'CPS-BLK-M', true),
+(7, 'Black', 'L', 2890, 5, 'CPS-BLK-L', true),
+(7, 'White', 'S', 2890, 6, 'CPS-WHT-S', true),
+(7, 'White', 'M', 2890, 8, 'CPS-WHT-M', true),
+(7, 'Navy', 'M', 2890, 7, 'CPS-NVY-M', true),
+(7, 'Navy', 'L', 2890, 4, 'CPS-NVY-L', true),
+-- Winter Hoodie variants
+(11, 'Black', 'S', 4200, 4, 'WHD-BLK-S', true),
+(11, 'Black', 'M', 4200, 6, 'WHD-BLK-M', true),
+(11, 'Black', 'L', 4200, 3, 'WHD-BLK-L', true),
+(11, 'Grey', 'M', 4200, 5, 'WHD-GRY-M', true),
+(11, 'Grey', 'L', 4200, 2, 'WHD-GRY-L', true),
+(11, 'Blue', 'M', 4200, 4, 'WHD-BLU-M', true);
+
+-- Sample Customers (password for all: password123)
+INSERT INTO users (email, password, full_name, phone, role, is_active, address, created_at, updated_at) VALUES
+('admin@lankathread.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Admin User', '+94771234567', 'ADMIN', true, '123 Main Street, Colombo', NOW(), NOW()),
+('kamal.silva@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Kamal Silva', '+94772345678', 'CUSTOMER', true, '45 Galle Road, Colombo 03', NOW(), NOW()),
+('nimali.fernando@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Nimali Fernando', '+94773456789', 'CUSTOMER', true, '12 Temple Road, Kandy', NOW(), NOW()),
+('ruwan.jayawardena@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Ruwan Jayawardena', '+94774567890', 'CUSTOMER', true, '78 Beach Road, Galle', NOW(), NOW()),
+('samani.perera@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Samani Perera', '+94775678901', 'CUSTOMER', false, '23 Park Street, Matara', NOW(), NOW()),
+('dinesh.rathnayake@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Dinesh Rathnayake', '+94776789012', 'CUSTOMER', true, '56 Lake View, Nuwara Eliya', NOW(), NOW()),
+('tharushi.wickramasinghe@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Tharushi Wickramasinghe', '+94777890123', 'CUSTOMER', true, '89 Temple Street, Anuradhapura', NOW(), NOW()),
+('asanka.bandara@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Asanka Bandara', '+94778901234', 'CUSTOMER', false, '34 Main Street, Jaffna', NOW(), NOW()),
+('malini.dissanayake@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Malini Dissanyake', '+94779012345', 'CUSTOMER', true, '67 Flower Road, Negombo', NOW(), NOW());
