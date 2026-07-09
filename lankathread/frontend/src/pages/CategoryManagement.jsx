@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, Form, Modal } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiChevronRight } from 'react-icons/fi';
+import { FiFolder, FiEdit2, FiTrash2, FiPlus, FiChevronRight, FiStar } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { categoryAPI } from '../services/api';
 import { toast } from 'react-toastify';
@@ -120,6 +120,19 @@ const CategoryManagement = () => {
     }
   };
 
+  const handleTogglePin = async (categoryId) => {
+    try {
+      const res = await categoryAPI.togglePin(categoryId);
+      if (res.data.success) {
+        toast.success(res.data.message || 'Category pin toggled');
+        fetchCategories();
+      }
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+      toast.error('Failed to toggle pin');
+    }
+  };
+
   const getParentCategoryName = (parentId) => {
     const parent = parentCategories.find(cat => cat.id === parentId);
     return parent ? parent.name : '-';
@@ -163,6 +176,7 @@ const CategoryManagement = () => {
                       <th>Parent Category</th>
                       <th>Display Order</th>
                       <th>Status</th>
+                      <th>Pinned</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -193,6 +207,19 @@ const CategoryManagement = () => {
                           </Badge>
                         </td>
                         <td>
+                          {!category.parentId && (
+                            <Button
+                              variant="link"
+                              className={`p-0 ${category.isPinned ? 'text-warning' : 'text-muted'}`}
+                              onClick={() => handleTogglePin(category.id)}
+                              title={category.isPinned ? 'Unpin from navbar' : 'Pin to navbar (max 5)'}
+                            >
+                              <FiStar size={18} fill={category.isPinned ? 'currentColor' : 'none'} />
+                            </Button>
+                          )}
+                          {category.isPinned && <Badge bg="warning" className="ms-1">Pinned</Badge>}
+                        </td>
+                        <td>
                           <Button variant="link" className="p-0 me-2" onClick={() => openModal(category)}>
                             <FiEdit2 size={16} />
                           </Button>
@@ -220,6 +247,15 @@ const CategoryManagement = () => {
                     <FiFolder className="me-2 text-primary" />
                     <strong>{parent.name}</strong>
                     <Badge bg="success" className="ms-2">Main</Badge>
+                    {parent.isPinned && <Badge bg="warning" className="ms-2">Pinned</Badge>}
+                    <Button
+                      variant="link"
+                      className={`p-0 ms-2 ${parent.isPinned ? 'text-warning' : 'text-muted'}`}
+                      onClick={() => handleTogglePin(parent.id)}
+                      title={parent.isPinned ? 'Unpin from navbar' : 'Pin to navbar (max 5)'}
+                    >
+                      <FiStar size={16} fill={parent.isPinned ? 'currentColor' : 'none'} />
+                    </Button>
                   </div>
                   {getSubcategories(parent.id).length > 0 && (
                     <div className="ms-4 mt-2">

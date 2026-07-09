@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container, Badge, Form, Button, Dropdown } from 'react-bootstrap';
-import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiHeart, FiUser, FiSearch, FiMenu, FiX, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import { productAPI } from '../services/api';
+import { productAPI, categoryAPI } from '../services/api';
 
 const AppNavbar = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -14,6 +14,10 @@ const AppNavbar = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [pinnedCategories, setPinnedCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState({}); // { parentId: [subcats] }
+  const [hoveredCat, setHoveredCat] = useState(null);
+  const hoverTimeout = useRef(null);
 
   useEffect(() => {
     setExpanded(false);
@@ -21,9 +25,45 @@ const AppNavbar = () => {
 
   useEffect(() => {
     if (user) {
-      setCartCount(2); // Mock cart count - would be fetched from API
+      setCartCount(2); // Mock cart count
     }
   }, [user]);
+
+  // Fetch pinned categories for navbar
+  useEffect(() => {
+    fetchPinnedCategories();
+  }, []);
+
+  const fetchPinnedCategories = async () => {
+    try {
+      const res = await categoryAPI.getPinnedCategories();
+      if (res.data.success) {
+        setPinnedCategories(res.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching pinned categories:', error);
+    }
+  };
+
+  // Fetch subcategories when hovering a pinned category
+  const handleCatMouseEnter = async (catId) => {
+    clearTimeout(hoverTimeout.current);
+    setHoveredCat(catId);
+    if (!subcategories[catId]) {
+      try {
+        const res = await categoryAPI.getSubcategories(catId);
+        if (res.data.success) {
+          setSubcategories(prev => ({ ...prev, [catId]: res.data.data }));
+        }
+      } catch (error) {
+        console.error('Error fetching subcategories:', error);
+      }
+    }
+  };
+
+  const handleCatMouseLeave = () => {
+    hoverTimeout.current = setTimeout(() => setHoveredCat(null), 200);
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -75,10 +115,65 @@ const AppNavbar = () => {
           <Navbar.Collapse id="main-nav">
             <Nav className="mx-auto">
               <Nav.Link as={Link} to="/" className="nav-link-custom">Home</Nav.Link>
-              <Nav.Link as={Link} to="/products?gender=WOMEN" className="nav-link-custom">Women</Nav.Link>
-              <Nav.Link as={Link} to="/products?gender=MEN" className="nav-link-custom">Men</Nav.Link>
-              <Nav.Link as={Link} to="/products?gender=KIDS" className="nav-link-custom">Kids</Nav.Link>
-              <Nav.Link as={Link} to="/products?gender=TEENS" className="nav-link-custom">Teens</Nav.Link>
+
+              {/* Dynamic pinned categories with subcategory dropdown */}
+              {pinnedCategories.map(cat => (
+                <div
+                  key={cat.id}
+                  className="nav-cat-wrapper d-none d-lg-block"
+                  onMouseEnter={() => handleCatMouseEnter(cat.id)}
+                  onMouseLeave={handleCatMouseLeave}
+                >
+                  <Nav.Link
+                    as={Link}
+                    to={`/products?parentCategory=${cat.id}`}
+                    className="nav-link-custom"
+                  >
+                    {cat.name} <FiChevronDown size={12} className="ms-1" />
+                  </Nav.Link>
+                  {hoveredCat === cat.id && subcategories[cat.id] && subcategories[cat.id].length > 0 && (
+                    <div className="nav-subcat-dropdown">
+                      {subcategories[cat.id].map(sub => (
+                        <Link
+                          key={sub.id}
+                          to={`/products?category=${sub.id}`}
+                          className="nav-subcat-item"
+                          onClick={() => setHoveredCat(null)}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Mobile: show pinned categories as simple links */}
+              {pinnedCategories.map(cat => (
+                <Nav.Link
+                  key={`m-${cat.id}`}
+                  as={Link}
+                  to={`/products?parentCategory=${cat.id}`}
+                  className="nav-link-custom d-lg-none"
+                >
+                  {cat.name}
+                </Nav.Link>
+              ))}
+
+              {/* Mobile: show subcategories under each main cat */}
+              {pinnedCategories.map(cat => (
+                subcategories[cat.id]?.map(sub => (
+                  <Nav.Link
+                    key={`ms-${sub.id}`}
+                    as={Link}
+                    to={`/products?category=${sub.id}`}
+                    className="nav-link-custom d-lg-none ps-4 small"
+                  >
+                    ↳ {sub.name}
+                  </Nav.Link>
+                ))
+              ))}
+
               <Nav.Link as={Link} to="/products?newArrivals=true" className="nav-link-custom text-gold">New Arrivals</Nav.Link>
             </Nav>
 

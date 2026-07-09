@@ -8,6 +8,7 @@ import java.util.List;
 public class ProductFilterRequest {
     private String search;
     private Long categoryId;
+    private Long parentCategoryId;
     private String gender;
     private List<String> sizes;
     private Double minPrice;
@@ -16,6 +17,7 @@ public class ProductFilterRequest {
     private List<String> brands;
     private Boolean inStock;
     private Boolean newArrivals;
+    private Boolean onSale;
     private String sortBy = "createdAt";
     private String sortOrder = "desc";
 }

@@ -10,7 +10,8 @@ const Products = () => {
   const queryParams = new URLSearchParams(location.search);
 
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]); // main categories
+  const [subcategories, setSubcategories] = useState([]); // subcategories for selected main category
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -20,7 +21,7 @@ const Products = () => {
 
   const [filters, setFilters] = useState({
     search: queryParams.get('search') || '',
-    gender: queryParams.get('gender') || '',
+    parentCategoryId: queryParams.get('parentCategory') || '',
     categoryId: queryParams.get('category') || '',
     minPrice: '',
     maxPrice: '',
@@ -29,6 +30,7 @@ const Products = () => {
     colors: [],
     inStock: false,
     newArrivals: queryParams.get('newArrivals') === 'true' || false,
+    onSale: false,
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
@@ -44,7 +46,7 @@ const Products = () => {
   useEffect(() => {
     setFilters({
       search: queryParams.get('search') || '',
-      gender: queryParams.get('gender') || '',
+      parentCategoryId: queryParams.get('parentCategory') || '',
       categoryId: queryParams.get('category') || '',
       minPrice: '',
       maxPrice: '',
@@ -53,6 +55,7 @@ const Products = () => {
       colors: [],
       inStock: false,
       newArrivals: queryParams.get('newArrivals') === 'true' || false,
+      onSale: false,
       sortBy: 'createdAt',
       sortOrder: 'desc'
     });
@@ -72,17 +75,38 @@ const Products = () => {
     }
   };
 
+  // Fetch subcategories when parentCategoryId changes
+  useEffect(() => {
+    if (filters.parentCategoryId) {
+      categoryAPI.getSubcategories(filters.parentCategoryId)
+        .then(res => {
+          if (res.data.success) {
+            setSubcategories(res.data.data);
+          }
+        })
+        .catch(err => console.error('Error fetching subcategories:', err));
+    } else {
+      setSubcategories([]);
+    }
+  }, [filters.parentCategoryId]);
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const filterPayload = {
-        ...filters,
-        gender: filters.gender,
+        search: filters.search,
+        parentCategoryId: filters.parentCategoryId ? parseInt(filters.parentCategoryId) : null,
         categoryId: filters.categoryId ? parseInt(filters.categoryId) : null,
         minPrice: filters.minPrice ? parseFloat(filters.minPrice) : null,
         maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : null,
+        brands: filters.brands,
+        sizes: filters.sizes,
+        colors: filters.colors,
         inStock: filters.inStock || null,
-        newArrivals: filters.newArrivals || null
+        newArrivals: filters.newArrivals || null,
+        onSale: filters.onSale || null,
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder
       };
 
       const response = await productAPI.filter(filterPayload, currentPage, 20);
@@ -120,8 +144,8 @@ const Products = () => {
 
   const resetFilters = () => {
     setFilters({
-      search: '', gender: '', categoryId: '', minPrice: '', maxPrice: '',
-      brands: [], sizes: [], colors: [], inStock: false, newArrivals: false,
+      search: '', parentCategoryId: '', categoryId: '', minPrice: '', maxPrice: '',
+      brands: [], sizes: [], colors: [], inStock: false, newArrivals: false, onSale: false,
       sortBy: 'createdAt', sortOrder: 'desc'
     });
     navigate('/products');
@@ -135,19 +159,37 @@ const Products = () => {
       </div>
 
       <div className="filter-group">
-        <h6 className="filter-title">Gender</h6>
+        <h6 className="filter-title">Main Category</h6>
         <Form.Select 
-          value={filters.gender} 
-          onChange={(e) => handleFilterChange('gender', e.target.value)}
+          value={filters.parentCategoryId} 
+          onChange={(e) => {
+            handleFilterChange('parentCategoryId', e.target.value);
+            handleFilterChange('categoryId', ''); // reset subcategory when main changes
+          }}
           className="filter-select"
         >
-          <option value="">All Genders</option>
-          <option value="WOMEN">Women</option>
-          <option value="MEN">Men</option>
-          <option value="KIDS">Kids</option>
-          <option value="TEENS">Teens</option>
+          <option value="">All Categories</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
         </Form.Select>
       </div>
+
+      {subcategories.length > 0 && (
+        <div className="filter-group">
+          <h6 className="filter-title">Subcategory</h6>
+          <Form.Select 
+            value={filters.categoryId} 
+            onChange={(e) => handleFilterChange('categoryId', e.target.value)}
+            className="filter-select"
+          >
+            <option value="">All Subcategories</option>
+            {subcategories.map(sub => (
+              <option key={sub.id} value={sub.id}>{sub.name}</option>
+            ))}
+          </Form.Select>
+        </div>
+      )}
 
       <div className="filter-group">
         <h6 className="filter-title">Price Range (LKR)</h6>
@@ -217,6 +259,14 @@ const Products = () => {
           onChange={(e) => handleFilterChange('newArrivals', e.target.checked)}
           className="filter-checkbox"
         />
+        <Form.Check
+          type="checkbox"
+          id="onSale"
+          label="On Sale / Discount"
+          checked={filters.onSale}
+          onChange={(e) => handleFilterChange('onSale', e.target.checked)}
+          className="filter-checkbox"
+        />
       </div>
 
       <div className="filter-actions">
@@ -237,7 +287,8 @@ const Products = () => {
         <h1 className="page-title">
           {filters.search ? `Search: "${filters.search}"` : 
            filters.newArrivals ? 'New Arrivals' :
-           filters.gender ? `${filters.gender.charAt(0) + filters.gender.slice(1).toLowerCase()}'s Collection` : 
+           filters.categoryId ? `${categories.find(c => c.id === parseInt(filters.categoryId))?.name || 'Category'}` :
+           filters.parentCategoryId ? `${categories.find(c => c.id === parseInt(filters.parentCategoryId))?.name || 'Category'} Collection` : 
            'All Products'}
         </h1>
         <div className="d-flex gap-2 align-items-center">

@@ -351,6 +351,11 @@ const AdminDashboard = () => {
   const displayOrders = orders;
   const displayProducts = products;
 
+  // Helper: get active promotion for a product
+  const getPromotionForProduct = (productId) => {
+    return promotions.find(p => p.product?.id === productId && p.isActive);
+  };
+
   if (!user) {
     return (
       <Container className="py-5 text-center">
@@ -598,26 +603,30 @@ const AdminDashboard = () => {
                     <Table className="admin-table mb-0">
                       <thead>
                         <tr>
-                          <th>Product</th>
+                          <th>Image</th>
+                          <th>Product Name</th>
                           <th>Category</th>
                           <th>Price (LKR)</th>
                           <th>Stock</th>
                           <th>Barcode</th>
                           <th>Store Location</th>
+                          <th>Promotion</th>
                           <th>Status</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {displayProducts.map(product => (
+                        {displayProducts.map(product => {
+                          const promo = getPromotionForProduct(product.id);
+                          return (
                           <tr key={product.id}>
                             <td>
-                              <div className="d-flex align-items-center">
-                                <img src={product.mainImage || 'https://via.placeholder.com/40'} alt="" className="product-thumb me-2" />
-                                <span>{product.name}</span>
-                              </div>
+                              <img src={product.mainImage || 'https://via.placeholder.com/40'} alt="" className="product-thumb me-2" />
                             </td>
-                            <td>{product.category?.name}</td>
+                            <td>
+                              <strong>{product.name}</strong>
+                            </td>
+                            <td>{product.category?.name || '-'}</td>
                             <td>
                               {product.salePrice ? (
                                 <>
@@ -640,6 +649,21 @@ const AdminDashboard = () => {
                               <small className="text-muted">{product.storeLocation || '-'}</small>
                             </td>
                             <td>
+                              {promo ? (
+                                <Badge bg="danger" className="position-relative">
+                                  <FiTag className="me-1" />
+                                  {promo.discountPercentage ? `${promo.discountPercentage}% OFF` :
+                                   promo.discountAmount ? `LKR ${promo.discountAmount} OFF` :
+                                   promo.salePrice ? `Sale LKR ${promo.salePrice.toLocaleString()}` : 'Promo'}
+                                  {promo.endDate && (
+                                    <span className="ms-1 small">til {new Date(promo.endDate).toLocaleDateString()}</span>
+                                  )}
+                                </Badge>
+                              ) : (
+                                <span className="text-muted">-</span>
+                              )}
+                            </td>
+                            <td>
                               {product.isArchived ? (
                                 <Badge bg="warning"><FiArchive className="me-1" />Archived</Badge>
                               ) : (
@@ -655,6 +679,12 @@ const AdminDashboard = () => {
                               <Button variant="link" className="p-0 me-1" onClick={() => navigate(`/products/${product.slug}`)} title="View">
                                 <FiEye size={16} />
                               </Button>
+                              <Button variant="link" className="p-0 me-1 text-danger" onClick={() => handleDeleteProduct(product.id)} title="Delete">
+                                <FiTrash2 size={16} />
+                              </Button>
+                              <Button variant="link" className="p-0 me-1 text-info" onClick={() => openPromotionModal(product)} title="Add Promotion">
+                                <FiTag size={16} />
+                              </Button>
                               {product.isArchived ? (
                                 <Button variant="link" className="p-0 me-1 text-success" onClick={() => handleUnarchiveProduct(product.id)} title="Unarchive">
                                   <FiArchive size={16} />
@@ -664,12 +694,10 @@ const AdminDashboard = () => {
                                   <FiArchive size={16} />
                                 </Button>
                               )}
-                              <Button variant="link" className="p-0 text-danger" onClick={() => handleDeleteProduct(product.id)} title="Delete">
-                                <FiTrash2 size={16} />
-                              </Button>
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </Table>
                   </div>

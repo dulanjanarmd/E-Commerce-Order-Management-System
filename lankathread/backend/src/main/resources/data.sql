@@ -1,12 +1,12 @@
 -- LankaThread Database Seed Data
 -- Run this after the application starts to populate initial data
 
--- Categories
-INSERT INTO categories (name, slug, description, image_url, display_order, active) VALUES
-('Women', 'women', 'Elegant fashion for women including sarees, dresses, kurtis, and more', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400', 1, true),
-('Men', 'men', 'Stylish menswear including shirts, t-shirts, trousers, and accessories', 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400', 2, true),
-('Kids', 'kids', 'Adorable clothing for kids aged 2-12 years', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', 3, true),
-('Teens', 'teens', 'Trendy fashion for teenagers', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', 4, true);
+-- Categories (is_pinned=1 means shown in top navbar)
+INSERT INTO categories (name, slug, description, image_url, display_order, is_pinned, pin_order, active) VALUES
+('Women', 'women', 'Elegant fashion for women including sarees, dresses, kurtis, and more', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400', 1, true, 1, true),
+('Men', 'men', 'Stylish menswear including shirts, t-shirts, trousers, and accessories', 'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400', 2, true, 2, true),
+('Kids', 'kids', 'Adorable clothing for kids aged 2-12 years', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400', 3, true, 3, true),
+('Teens', 'teens', 'Trendy fashion for teenagers', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400', 4, true, 4, true);
 
 -- Subcategories for Women
 INSERT INTO categories (name, slug, description, parent_id, display_order, active) VALUES

@@ -60,9 +60,11 @@ export const productAPI = {
 export const categoryAPI = {
   getAll: () => api.get('/categories'),
   getParentCategories: () => api.get('/categories/parent'),
+  getPinnedCategories: () => api.get('/categories/pinned'),
   getSubcategories: (parentId) => api.get(`/categories/${parentId}/subcategories`),
   create: (data) => api.post('/categories', data),
   update: (id, data) => api.put(`/categories/${id}`, data),
+  togglePin: (id) => api.put(`/categories/${id}/toggle-pin`),
   delete: (id) => api.delete(`/categories/${id}`)
 };
 

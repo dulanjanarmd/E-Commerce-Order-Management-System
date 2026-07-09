@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Card, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiShoppingBag, FiTruck, FiHeadphones, FiShield } from 'react-icons/fi';
-import { productAPI, categoryAPI } from '../services/api';
+import { productAPI, categoryAPI, promotionAPI } from '../services/api';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState({}); // { parentId: [subcats] }
+  const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,15 +18,31 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const [featuredRes, arrivalsRes, categoriesRes] = await Promise.all([
+      const [featuredRes, arrivalsRes, categoriesRes, promoRes] = await Promise.all([
         productAPI.getFeatured(),
         productAPI.getNewArrivals(),
-        categoryAPI.getParentCategories()
+        categoryAPI.getParentCategories(),
+        promotionAPI.getActive()
       ]);
 
       if (featuredRes.data.success) setFeaturedProducts(featuredRes.data.data.slice(0, 8));
       if (arrivalsRes.data.success) setNewArrivals(arrivalsRes.data.data.slice(0, 8));
-      if (categoriesRes.data.success) setCategories(categoriesRes.data.data);
+      if (categoriesRes.data.success) {
+        const mainCats = categoriesRes.data.data;
+        setCategories(mainCats);
+        // Fetch subcategories for each main category
+        mainCats.forEach(async (cat) => {
+          try {
+            const subRes = await categoryAPI.getSubcategories(cat.id);
+            if (subRes.data.success) {
+              setSubcategories(prev => ({ ...prev, [cat.id]: subRes.data.data }));
+            }
+          } catch (err) {
+            console.error(`Error fetching subcategories for ${cat.name}:`, err);
+          }
+        });
+      }
+      if (promoRes.data) setPromotions(promoRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -75,7 +93,7 @@ const Home = () => {
           <Row className="g-4">
             {categories.map((cat, idx) => (
               <Col key={cat.id || idx} xs={6} md={3}>
-                <Link to={`/products?gender=${cat.slug.toUpperCase()}`} className="category-card-link">
+                <Link to={`/products?parentCategory=${cat.id}`} className="category-card-link">
                   <div className="category-card">
                     <div className="category-img-wrapper">
                       <img src={cat.imageUrl || 'https://via.placeholder.com/400?text=No+Image'} alt={cat.name} className="category-img" />
@@ -87,6 +105,20 @@ const Home = () => {
                     </div>
                   </div>
                 </Link>
+                {/* Show subcategories under main category */}
+                {subcategories[cat.id] && subcategories[cat.id].length > 0 && (
+                  <div className="mt-2 ps-2">
+                    {subcategories[cat.id].map(sub => (
+                      <Link
+                        key={sub.id}
+                        to={`/products?category=${sub.id}`}
+                        className="d-block text-muted small text-decoration-none py-1 subcat-link"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </Col>
             ))}
           </Row>
@@ -108,7 +140,7 @@ const Home = () => {
           <Row className="g-4">
             {displayFeatured.map(product => (
               <Col key={product.id} xs={6} md={4} lg={3}>
-                <ProductCard product={product} />
+                <ProductCard product={product} promotions={promotions} />
               </Col>
             ))}
           </Row>
@@ -144,7 +176,7 @@ const Home = () => {
           <Row className="g-4">
             {displayArrivals.map(product => (
               <Col key={product.id} xs={6} md={4} lg={3}>
-                <ProductCard product={product} />
+                <ProductCard product={product} promotions={promotions} />
               </Col>
             ))}
           </Row>
@@ -176,7 +208,8 @@ const Home = () => {
   );
 };
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, promotions }) => {
+  const promo = promotions?.find(p => p.product?.id === product.id && p.isActive);
   return (
     <Card className="product-card">
       <Link to={`/products/${product.slug}`} className="product-link">
@@ -184,6 +217,12 @@ const ProductCard = ({ product }) => {
           <Card.Img variant="top" src={product.mainImage} className="product-img" />
           {product.salePrice && (
             <Badge className="sale-badge">-{Math.round((1 - product.salePrice / product.price) * 100)}%</Badge>
+          )}
+          {promo && !product.salePrice && (
+            <Badge className="sale-badge bg-danger">
+              {promo.discountPercentage ? `${promo.discountPercentage}% OFF` :
+               promo.discountAmount ? `LKR ${promo.discountAmount} OFF` : 'Sale'}
+            </Badge>
           )}
           {product.isNewArrival && (
             <Badge className="new-badge">New</Badge>

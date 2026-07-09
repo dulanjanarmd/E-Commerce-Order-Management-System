@@ -24,6 +24,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getAllParentCategories());
     }
 
+    @GetMapping("/pinned")
+    public ResponseEntity<?> getPinnedCategories() {
+        return ResponseEntity.ok(categoryService.getPinnedCategories());
+    }
+
     @GetMapping("/{parentId}/subcategories")
     public ResponseEntity<?> getSubcategories(@PathVariable Long parentId) {
         return ResponseEntity.ok(categoryService.getSubcategories(parentId));
@@ -37,6 +42,11 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category category) {
         return ResponseEntity.ok(categoryService.updateCategory(id, category));
+    }
+
+    @PutMapping("/{id}/toggle-pin")
+    public ResponseEntity<?> togglePin(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.togglePin(id));
     }
 
     @DeleteMapping("/{id}")

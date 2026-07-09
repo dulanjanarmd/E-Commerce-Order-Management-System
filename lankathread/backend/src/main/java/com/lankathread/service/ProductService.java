@@ -75,12 +75,14 @@ public class ProductService {
         Page<Product> products = productRepository.findByFilters(
                 request.getSearch(),
                 request.getCategoryId(),
+                request.getParentCategoryId(),
                 gender,
                 request.getMinPrice(),
                 request.getMaxPrice(),
                 brandFilter,
                 request.getInStock(),
                 request.getNewArrivals(),
+                request.getOnSale(),
                 pageable
         );
 
@@ -98,6 +100,10 @@ public class ProductService {
     }
 
     public ApiResponse createProduct(Product product) {
+        // Auto-set active status based on stock
+        if (product.getStockQuantity() != null && product.getStockQuantity() <= 0) {
+            product.setIsActive(false);
+        }
         Product saved = productRepository.save(product);
         return ApiResponse.success("Product created", saved);
     }
@@ -124,10 +130,17 @@ public class ProductService {
         existing.setSizeStock(product.getSizeStock());
         existing.setIsNewArrival(product.getIsNewArrival());
         existing.setIsFeatured(product.getIsFeatured());
-        existing.setIsActive(product.getIsActive());
         existing.setBarcode(product.getBarcode());
         existing.setStoreLocation(product.getStoreLocation());
         existing.setIsArchived(product.getIsArchived());
+        // Auto-set active status based on stock: if stock is 0 or less, deactivate; if stock > 0 and not archived, activate
+        if (!Boolean.TRUE.equals(existing.getIsArchived())) {
+            if (existing.getStockQuantity() != null && existing.getStockQuantity() <= 0) {
+                existing.setIsActive(false);
+            } else if (existing.getStockQuantity() != null && existing.getStockQuantity() > 0) {
+                existing.setIsActive(product.getIsActive() != null ? product.getIsActive() : true);
+            }
+        }
         Product updated = productRepository.save(existing);
         return ApiResponse.success("Product updated", updated);
     }
